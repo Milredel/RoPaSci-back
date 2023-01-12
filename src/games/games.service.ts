@@ -3,6 +3,7 @@ import {Model} from 'mongoose';
 import {GAME_MODEL_IDENTIFIER} from 'src/common/constants';
 import {Game} from './interfaces/game.interface';
 import { UsersService } from '../users/users.service';
+import { CreateGameDto } from './dto/create-game.dto';
 
 @Injectable()
 export class GamesService {
@@ -36,5 +37,18 @@ export class GamesService {
      */
     async findById(id: number): Promise<Game[]> {
         return this.gameModel.find({id: id}).exec();
+    }
+
+
+    /**
+     * Create a game
+     *
+     * @param createGameDto
+     */
+    async createGame(createGameDto: CreateGameDto, userId: number): Promise<Game> {
+        const game = new this.gameModel(createGameDto);
+        game.set({creator: userId});
+        await game.save();
+        return game;
     }
 }
