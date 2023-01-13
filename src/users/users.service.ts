@@ -38,10 +38,10 @@ export class UsersService {
     /**
      * Find one User by its id
      *
-     * @params id number
+     * @params id string
      * @returns user
      */
-    async findById(id: number): Promise<User> {
-        return this.userModel.findOne({id: id}).exec();
+    async findById(id: string): Promise<User> {
+        return this.userModel.findOne({_id: id}).exec();
     }
 }
