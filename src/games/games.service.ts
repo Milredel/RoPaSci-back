@@ -47,7 +47,7 @@ export class GamesService {
      */
     async createGame(createGameDto: CreateGameDto, userId: number): Promise<Game> {
         const game = new this.gameModel(createGameDto);
-        game.set({creator: userId});
+        game.set({creator: userId, status: {status: 'pending', createdAt: new Date(), score: {creator: 0, opponent: 0}}});
         await game.save();
         return game;
     }
