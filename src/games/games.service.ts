@@ -34,6 +34,14 @@ export class GamesService {
     }
 
     /**
+     * Find all pending games
+     */
+    async findAllPending(): Promise<Game[]> {
+        const allGames = await this.findAll();
+        return allGames.filter(game => game.status.status === 'pending');
+    }
+
+    /**
      * Find one game by its id
      *
      * @params id string

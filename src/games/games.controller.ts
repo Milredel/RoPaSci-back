@@ -15,9 +15,9 @@ export class GamesController {
     ) { }
 
     @UseGuards(JwtAuthGuard)
-    @Get()
+    @Get('pending')
     async findAll(): Promise<Game[]> {
-        return await this.gamesService.findAll();
+        return await this.gamesService.findAllPending();
     }
 
     @UseGuards(JwtAuthGuard)
