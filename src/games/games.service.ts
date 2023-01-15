@@ -6,6 +6,8 @@ import {Round} from './interfaces/round.interface';
 import { UsersService } from '../users/users.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { CreateGameMoveDto } from './dto/create-game-move.dto';
+import { RESULT_CHECKER } from './constants';
+import { Status } from './interfaces/status.interface';
 
 @Injectable()
 export class GamesService {
@@ -49,7 +51,7 @@ export class GamesService {
      */
     async createGame(createGameDto: CreateGameDto, userId: string): Promise<Game> {
         const game = new this.gameModel(createGameDto);
-        game.set({creator: userId, status: {status: 'pending', createdAt: new Date(), score: {creator: 0, opponent: 0}}});
+        game.set({creator: userId, currentRound: 1, status: {status: 'pending', createdAt: new Date(), currentRound: 1, score: {creator: 0, opponent: 0}}});
         await game.save();
         return game;
     }
@@ -80,8 +82,50 @@ export class GamesService {
         }
         rounds[roundIndex][roundPlayerLabel] = {choice: createGameMoveDto.move, createdAt: new Date()};
         game.rounds = rounds;
+        this.updateRoundResult(game, roundIndex);
         await game.save();
         return game;
+    }
+
+    updateRoundResult(game: Game, roundIndex: number): Game {
+        const round = game.rounds[roundIndex];
+        if (Object.prototype.hasOwnProperty.call(round, 'creatorMove')
+            && Object.prototype.hasOwnProperty.call(round, 'opponentMove')) {
+            round.winner = this.calculateRoundResult(game, round);
+            round.endEdAt = new Date();
+            this.updateGameStatus(game, round);
+        }
+        return game;
+    }
+
+    calculateRoundResult(game: Game, round: Round): string {
+        return RESULT_CHECKER[game.mode][round.creatorMove.choice][round.opponentMove.choice];
+    }
+
+    updateGameStatus(game: Game, round: Round): Game {
+        game.status.currentRound = game.status.currentRound + 1;
+        const status = JSON.parse(JSON.stringify(game.status));
+        if (round.winner === 'draw') {
+            status.score.creator = status.score.creator + 1;
+            status.score.opponent = status.score.opponent + 1;
+        } else {
+            status.score[round.winner] = status.score[round.winner] + 1;
+        }
+        if (game.rounds.length === game.roundNumber) {
+            status.winner = this.calculateGameResult(status);
+            status.endedAt = new Date();
+            status.status = 'ended';
+        }
+        game.status = status;
+        return game;
+    }
+
+    calculateGameResult(status: Status): string {
+        if (status.score.creator === status.score.opponent) {
+            return 'draw';
+        } else {
+            return status.score.creator > status.score.opponent ? 'creator' : 'opponent';
+        }
     }
 
 }
