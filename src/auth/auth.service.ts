@@ -40,7 +40,7 @@ export class AuthService {
      */
     async hashPass(reqBody: any): Promise<string> {
         if (!Object.prototype.hasOwnProperty.call(reqBody, 'password')) {
-            throw new HttpException('Format de la requête non valide. Veuillez fournir un password.', 400);
+            throw new HttpException('Request format invalid. Please give a password.', 400);
         }
         const password = reqBody.password;
         return await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
