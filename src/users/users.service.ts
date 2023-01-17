@@ -12,14 +12,17 @@ export class UsersService {
     }
 
     /**
-     * Find all Users
+     * Find all users
+     *
+     * @returns {Promise<any[]>}
+     * @memberof UsersService
      */
     async findAll(): Promise<any[]> {
         const userListFull = await this.userModel.find().exec();
         const userListLight = userListFull.map(u => {
             return {
                 username: u.username,
-                id: u.id,
+                id: u._id,
             }
         });
         return userListLight;
@@ -28,18 +31,20 @@ export class UsersService {
     /**
      * Find one User by its username
      *
-     * @params username string
-     * @returns user
+     * @param {string} username
+     * @returns {Promise<User[]>}
+     * @memberof UsersService
      */
     async findByUsername(username: string): Promise<User[]> {
         return this.userModel.find({username: username}).exec();
     }
 
     /**
-     * Find one User by its id
+     * Find one user by its id
      *
-     * @params id string
-     * @returns user
+     * @param {string} id
+     * @returns {Promise<User>}
+     * @memberof UsersService
      */
     async findById(id: string): Promise<User> {
         return this.userModel.findOne({_id: id}).exec();

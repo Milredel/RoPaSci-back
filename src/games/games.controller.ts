@@ -14,18 +14,39 @@ export class GamesController {
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     ) { }
 
+    /**
+     * Find all games in pending status
+     *
+     * @returns {Promise<Game[]>}
+     * @memberof GamesController
+     */
     @UseGuards(JwtAuthGuard)
     @Get('pending')
     async findAll(): Promise<Game[]> {
         return await this.gamesService.findAllPending();
     }
 
+    /**
+     * Find a game by its id
+     *
+     * @param {string} id
+     * @returns {Promise<Game>}
+     * @memberof GamesController
+     */
     @UseGuards(JwtAuthGuard)
     @Get(':id')
     async findById(@Param('id') id: string): Promise<Game> {
         return await this.gamesService.findById(id);
     }
 
+    /**
+     * Create a new game
+     *
+     * @param {CreateGameDto} createGameDto
+     * @param {(Request | any)} request
+     * @returns {Promise<any>}
+     * @memberof GamesController
+     */
     @UseGuards(JwtAuthGuard)
     @Post('createGame')
     async createGame(@Body() createGameDto: CreateGameDto, @Req() request: Request | any): Promise<any> {
@@ -46,6 +67,14 @@ export class GamesController {
         }
     }
 
+    /**
+     * Create a new move for the given game and round
+     *
+     * @param {CreateGameMoveDto} createGameMoveDto
+     * @param {(Request | any)} request
+     * @returns {Promise<any>}
+     * @memberof GamesController
+     */
     @UseGuards(JwtAuthGuard)
     @Post('move')
     async createGameMove(@Body() createGameMoveDto: CreateGameMoveDto, @Req() request: Request | any): Promise<any> {

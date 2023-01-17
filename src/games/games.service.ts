@@ -22,6 +22,9 @@ export class GamesService {
 
     /**
      * Find all games
+     *
+     * @returns {Promise<Game[]>}
+     * @memberof GamesService
      */
     async findAll(): Promise<Game[]> {
         const allGames = await this.gameModel.find().exec();
@@ -37,6 +40,9 @@ export class GamesService {
 
     /**
      * Find all pending games
+     *
+     * @returns {Promise<Game[]>}
+     * @memberof GamesService
      */
     async findAllPending(): Promise<Game[]> {
         const allGames = await this.findAll();
@@ -46,18 +52,21 @@ export class GamesService {
     /**
      * Find one game by its id
      *
-     * @params id string
-     * @returns Game
+     * @param {string} id
+     * @returns {Promise<Game>}
+     * @memberof GamesService
      */
     async findById(id: string): Promise<Game> {
         return this.gameModel.findOne({_id: id}).exec();
     }
 
-
     /**
      * Create a game
      *
-     * @param createGameDto
+     * @param {CreateGameDto} createGameDto
+     * @param {string} userId
+     * @returns {Promise<Game>}
+     * @memberof GamesService
      */
     async createGame(createGameDto: CreateGameDto, userId: string): Promise<Game> {
         const game = new this.gameModel(createGameDto);
@@ -69,7 +78,10 @@ export class GamesService {
     /**
      * Insert a new move in a game round
      *
-     * @param createGameMoveDto
+     * @param {CreateGameMoveDto} createGameMoveDto
+     * @param {string} userId
+     * @returns {Promise<Game>}
+     * @memberof GamesService
      */
     async createGameMove(createGameMoveDto: CreateGameMoveDto, userId: string): Promise<Game> {
         const game = await this.findById(createGameMoveDto.gameId);
@@ -97,6 +109,14 @@ export class GamesService {
         return game;
     }
 
+    /**
+     * Update round result if it can do so
+     *
+     * @param {Game} game
+     * @param {number} roundIndex
+     * @returns {Game}
+     * @memberof GamesService
+     */
     updateRoundResult(game: Game, roundIndex: number): Game {
         const round = game.rounds[roundIndex];
         if (Object.prototype.hasOwnProperty.call(round, 'creatorMove')
@@ -108,10 +128,26 @@ export class GamesService {
         return game;
     }
 
+    /**
+     * Calculate round result
+     *
+     * @param {Game} game
+     * @param {Round} round
+     * @returns {string}
+     * @memberof GamesService
+     */
     calculateRoundResult(game: Game, round: Round): string {
         return RESULT_CHECKER[game.mode][round.creatorMove.choice][round.opponentMove.choice];
     }
 
+    /**
+     * Update game status
+     *
+     * @param {Game} game
+     * @param {Round} round
+     * @returns {Game}
+     * @memberof GamesService
+     */
     updateGameStatus(game: Game, round: Round): Game {
         game.status.currentRound = game.status.currentRound + 1;
         const status = JSON.parse(JSON.stringify(game.status));
@@ -130,6 +166,13 @@ export class GamesService {
         return game;
     }
 
+    /**
+     * Calculate game result
+     *
+     * @param {Status} status
+     * @returns {string}
+     * @memberof GamesService
+     */
     calculateGameResult(status: Status): string {
         if (status.score.creator === status.score.opponent) {
             return GAME_STRINGS.WINNERS.DRAW;

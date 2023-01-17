@@ -11,6 +11,12 @@ export class UsersController {
 
     ) { }
 
+    /**
+     * Find all users
+     *
+     * @returns {Promise<User[]>}
+     * @memberof UsersController
+     */
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(): Promise<User[]> {
