@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {Model} from 'mongoose';
-import {GAME_MODEL_IDENTIFIER} from 'src/common/constants';
+import {GAME_MODEL_IDENTIFIER} from '../common/constants';
 import {Game} from './interfaces/game.interface';
 import {Round} from './interfaces/round.interface';
 import { UsersService } from '../users/users.service';

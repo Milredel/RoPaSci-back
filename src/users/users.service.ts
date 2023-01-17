@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {Model} from 'mongoose';
-import {USER_MODEL_IDENTIFIER} from 'src/common/constants';
+import {USER_MODEL_IDENTIFIER} from '../common/constants';
 import {User} from './interfaces/user.interface';
 
 @Injectable()
