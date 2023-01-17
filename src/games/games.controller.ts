@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Put, Body, Post, HttpException, HttpStatus, Delete, UseGuards, Req, Inject } from '@nestjs/common';
 import { Game } from './interfaces/game.interface';
 import { GamesService } from './games.service';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -35,7 +35,7 @@ export class GamesController {
                 userId = request.user.userId;
             }
             const result = await this.gamesService.createGame(createGameDto, userId);
-            this.logger.info(`${request.user.username} has created a game: \n\tmode: ${createGameDto.mode} \n\troundNumber: ${createGameDto.roundNumber} \n\topponent: ${createGameDto.opponent}`);
+            this.logger.info(`${request.user.username} has created a game (mode: ${createGameDto.mode}, roundNumber: ${createGameDto.roundNumber}, opponent: ${createGameDto.opponent})`);
             return result;
         } catch (e) {
             this.logger.error(`${e.message}`);
@@ -55,7 +55,7 @@ export class GamesController {
                 userId = request.user.userId;
             }
             const result = await this.gamesService.createGameMove(createGameMoveDto, userId);
-            this.logger.info(`${request.user.username} has created a game move: \n\tgame id: ${createGameMoveDto.gameId} \n\tround: ${createGameMoveDto.round} \n\tmove: ${createGameMoveDto.move}`);
+            this.logger.info(`${request.user.username} has created a game move: (game id: ${createGameMoveDto.gameId}, round: ${createGameMoveDto.round}, move: ${createGameMoveDto.move})`);
             return result;
         } catch (e) {
             this.logger.error(`${e.message}`);

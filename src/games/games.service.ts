@@ -2,12 +2,14 @@ import {Inject, Injectable} from '@nestjs/common';
 import {Model} from 'mongoose';
 import {GAME_MODEL_IDENTIFIER} from '../common/constants';
 import {Game} from './interfaces/game.interface';
+
 import {Round} from './interfaces/round.interface';
 import { UsersService } from '../users/users.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { CreateGameMoveDto } from './dto/create-game-move.dto';
 import { RESULT_CHECKER } from './constants';
 import { Status } from './interfaces/status.interface';
+import { GAME_STRINGS } from './constants';
 
 @Injectable()
 export class GamesService {
@@ -38,7 +40,7 @@ export class GamesService {
      */
     async findAllPending(): Promise<Game[]> {
         const allGames = await this.findAll();
-        return allGames.filter(game => game.status.status === 'pending');
+        return allGames.filter(game => game.status.status === GAME_STRINGS.STATUS.PENDING);
     }
 
     /**
@@ -59,7 +61,7 @@ export class GamesService {
      */
     async createGame(createGameDto: CreateGameDto, userId: string): Promise<Game> {
         const game = new this.gameModel(createGameDto);
-        game.set({creator: userId, currentRound: 1, status: {status: 'pending', createdAt: new Date(), currentRound: 1, score: {creator: 0, opponent: 0}}});
+        game.set({creator: userId, currentRound: 1, status: {status: GAME_STRINGS.STATUS.PENDING, createdAt: new Date(), currentRound: 1, score: {creator: 0, opponent: 0}}});
         await game.save();
         return game;
     }
@@ -113,7 +115,7 @@ export class GamesService {
     updateGameStatus(game: Game, round: Round): Game {
         game.status.currentRound = game.status.currentRound + 1;
         const status = JSON.parse(JSON.stringify(game.status));
-        if (round.winner === 'draw') {
+        if (round.winner === GAME_STRINGS.WINNERS.DRAW) {
             status.score.creator = status.score.creator + 1;
             status.score.opponent = status.score.opponent + 1;
         } else {
@@ -122,7 +124,7 @@ export class GamesService {
         if (game.rounds.length === game.roundNumber) {
             status.winner = this.calculateGameResult(status);
             status.endedAt = new Date();
-            status.status = 'ended';
+            status.status = GAME_STRINGS.STATUS.ENDED;
         }
         game.status = status;
         return game;
@@ -130,9 +132,9 @@ export class GamesService {
 
     calculateGameResult(status: Status): string {
         if (status.score.creator === status.score.opponent) {
-            return 'draw';
+            return GAME_STRINGS.WINNERS.DRAW;
         } else {
-            return status.score.creator > status.score.opponent ? 'creator' : 'opponent';
+            return status.score.creator > status.score.opponent ? GAME_STRINGS.WINNERS.CREATOR : GAME_STRINGS.WINNERS.OPPONENT;
         }
     }
 

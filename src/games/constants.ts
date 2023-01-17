@@ -1,3 +1,32 @@
+export const GAME_STRINGS = {
+    CHOICES: {
+        ROCK: 'rock',
+        PAPER: 'paper',
+        SCISSORS: 'scissors',
+        WELL: 'well',
+        LIZARD: 'lizard',
+        SPOCK: 'spock'
+    },
+    MODES: {
+        CLASSIC: 'classic',
+        FRENCH: 'french',
+        STAR_TREK: 'star_trek'
+    },
+    OPPONENTS: {
+        COMPUTER: 'computer',
+        HUMAN: 'human'
+    },
+    STATUS: {
+        PENDING: 'pending',
+        ENDED: 'ended'
+    },
+    WINNERS: {
+        CREATOR: 'creator',
+        OPPONENT: 'opponent',
+        DRAW: 'draw'
+    }
+};
+
 export const RESULT_CHECKER = {
     'classic': {
         'rock' : {
