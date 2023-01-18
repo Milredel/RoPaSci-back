@@ -28,6 +28,20 @@ describe('GamesController', () => {
         });
     });
 
+    describe('findEndedGames', () => {
+        it('should call gamesService.findEndedGames with correct params', () => {
+            controller.findEndedGames({user: {userId: '666'}}, 0, 5);
+            return (expect(gamesService.findEndedGames) as any).to.have.been.calledWith('666', 0, 5);
+        });
+    });
+
+    describe('getStats', () => {
+        it('should call gamesService.computeStats with correct params', () => {
+            controller.getStats({user: {userId: '666'}});
+            return (expect(gamesService.computeStats) as any).to.have.been.calledWith('666');
+        });
+    });
+
     describe('findById', () => {
         it('should call gamesService.findById with correct arg', () => {
             stub(gamesService, 'findById');

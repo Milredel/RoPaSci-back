@@ -7,7 +7,7 @@ describe('UsersService', () => {
 
     beforeEach(() => {
         service = new UsersService(
-            userModel = {
+            userModel = { // definitely not the way to do it
                 find: () => {return { exec: () => null}},
                 findOne: () => {return { exec: () => null}}
             } as any
@@ -19,10 +19,19 @@ describe('UsersService', () => {
     });
 
     describe('findAll', () => {
-        it('should call userModel.find()', () => {
-            stub(userModel, 'find');
-            service.findAll();
-            return (expect(userModel.find) as any).to.have.been.called;
+        it('should call userModel.find()', async () => {
+            stub(userModel, 'find').callsFake(() => { return { exec: () => [
+                {some: 'user 1 data', username: 'toto 1', _id: '111'},
+                {some: 'user 2 data', username: 'toto 2', _id: '222'},
+                {some: 'user 3 data', username: 'toto 3', _id: '333'}
+            ]}});
+            const res = await service.findAll();
+            return (expect(userModel.find) as any).to.have.been.called
+                && (expect(res) as any).to.be.deep.eq([
+                    {username: 'toto 1', id: '111'},
+                    {username: 'toto 2', id: '222'},
+                    {username: 'toto 3', id: '333'}
+                ]);
         });
     });
 

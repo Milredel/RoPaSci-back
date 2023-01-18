@@ -1,4 +1,5 @@
-import { Controller, Get, Param, Put, Body, Post, HttpException, HttpStatus, Delete, UseGuards, Req, Inject } from '@nestjs/common';
+import { StatisticsType } from './interfaces/statistics.interface';
+import { Controller, Get, Param, Body, Post, HttpException, HttpStatus, UseGuards, Req, Inject } from '@nestjs/common';
 import { Game } from './interfaces/game.interface';
 import { GamesService } from './games.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -29,6 +30,9 @@ export class GamesController {
     /**
      * Find games in ended status, limiting results by page and limit
      *
+     * @param {(Request | any)} request
+     * @param {number} page
+     * @param {number} limit
      * @returns {Promise<Game[]>}
      * @memberof GamesController
      */
@@ -42,14 +46,21 @@ export class GamesController {
         return await this.gamesService.findEndedGames(userId, page, limit);
     }
 
+    /**
+     * Returns stats from the games ended and pending of the user
+     *
+     * @param {(Request | any)} request
+     * @returns {Promise<Game>}
+     * @memberof GamesController
+     */
     @UseGuards(JwtAuthGuard)
     @Get('stats')
-    async getStats(@Req() request: Request | any): Promise<Game> {
+    async getStats(@Req() request: Request | any): Promise<StatisticsType> {
         let userId = null;
         if (Object.prototype.hasOwnProperty.call(request, 'user') && Object.prototype.hasOwnProperty.call(request.user, 'userId')) {
             userId = request.user.userId;
         }
-        return await this.gamesService.getStats(userId);
+        return await this.gamesService.computeStats(userId);
     }
 
     /**

@@ -10,6 +10,7 @@ import { GameModesTypes, RESULT_CHECKER } from './constants';
 import { Status } from './interfaces/status.interface';
 import { GameStatusTypes, GameWinnersTypes } from './constants';
 import * as moment from 'moment';
+import { StatisticsByModesType, StatisticsType } from './interfaces/statistics.interface';
 
 @Injectable()
 export class GamesService {
@@ -49,6 +50,15 @@ export class GamesService {
         return allGames.filter(game => game.status.status === GameStatusTypes.PENDING);
     }
 
+    /**
+     * Find all ended games by the given user
+     *
+     * @param {string} userId
+     * @param {number} [page=null]
+     * @param {number} [limit=null]
+     * @returns {Promise<Game[]>}
+     * @memberof GamesService
+     */
     async findEndedGames(userId: string, page: number = null, limit: number = null): Promise<Game[]> {
         const options = {sort: {'status.createdAt': -1}};
         if (page !== null && limit !== null) {
@@ -197,23 +207,29 @@ export class GamesService {
         }
     }
 
-    async getStats(userId: string): Promise<any> {
-        const stats = {};
+    /**
+     * Computes game stats for the given user
+     *
+     * @param {string} userId
+     * @returns {Promise<any>}
+     * @memberof GamesService
+     */
+    async computeStats(userId: string): Promise<StatisticsType> {
+        const stats = {} as StatisticsType;
         const allEndedGames = await this.findEndedGames(userId);
         const allPendingGames = await this.findAllPending();
-        stats['totalPlayedGames'] = allEndedGames.length;
-        stats['playedByModes'] = {};
-        stats['playedByModes'][GameModesTypes.CLASSIC] = allEndedGames.filter(game => game.mode === GameModesTypes.CLASSIC).length;
-        stats['playedByModes'][GameModesTypes.FRENCH] = allEndedGames.filter(game => game.mode === GameModesTypes.FRENCH).length;
-        stats['playedByModes'][GameModesTypes.STAR_TREK] = allEndedGames.filter(game => game.mode === GameModesTypes.STAR_TREK).length;
-        stats['totalPendingGames'] = allPendingGames.length;
-        stats['totalScoreVsComputer'] = { // assuming there is no human opponent
+        stats.totalPlayedGames = allEndedGames.length;
+        stats.playedByModes = {} as StatisticsByModesType;
+        stats.playedByModes[GameModesTypes.CLASSIC] = allEndedGames.filter(game => game.mode === GameModesTypes.CLASSIC).length;
+        stats.playedByModes[GameModesTypes.FRENCH] = allEndedGames.filter(game => game.mode === GameModesTypes.FRENCH).length;
+        stats.playedByModes[GameModesTypes.STAR_TREK] = allEndedGames.filter(game => game.mode === GameModesTypes.STAR_TREK).length;
+        stats.totalPendingGames = allPendingGames.length;
+        stats.totalScoreVsComputer = { // assuming there is no human opponent
             'win': allEndedGames.filter(game => game.status.winner === GameWinnersTypes.CREATOR).length,
             'lose': allEndedGames.filter(game => game.status.winner === GameWinnersTypes.OPPONENT).length,
             'draw': allEndedGames.filter(game => game.status.winner === GameWinnersTypes.DRAW).length
         };
-        const averageDiff = allEndedGames.map(game => moment(game.status.endedAt).diff(moment(game.status.createdAt))).reduce((a,b,i) => a+(b-a)/(i+1));
-        stats['averageTime'] = moment.duration(averageDiff);
+        stats.averageTime = allEndedGames.map(game => moment(game.status.endedAt).diff(moment(game.status.createdAt))).reduce((a,b,i) => a+(b-a)/(i+1));
         return stats;
     }
 

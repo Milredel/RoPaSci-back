@@ -3,7 +3,7 @@ import { GamesService } from './games.service';
 import { expect, stub, stubClass } from '../../src/test';
 import { GameModesTypes, GameMovesTypes, GameStatusTypes, GameWinnersTypes } from './constants';
 
-export class GameModel {
+export class GameModel { // this is clearly not the way to do it !
     creator: string;
     rounds: Array<any>;
     constructor(creator: string = null, rounds: Array<any> = []) {
@@ -47,6 +47,24 @@ describe('GamesService', () => {
             const res = await service.findAllPending();
             return (expect(service.findAll) as any).to.have.been.called
                 && (expect(res) as any).to.be.deep.eq([{status: {some: 'game 1 status data', status: GameStatusTypes.PENDING}}]);
+        });
+    });
+
+    describe('findEndedGames', () => {
+        it('should call gameModel.find() and _usersService.findById() without page and limit if not given', async () => {
+            stub(gameModel, 'find').callsFake(() => {return { exec: () => [{some: 'game 1 data'}, {some: 'game 2 data'}] }; });
+            stub(_usersService, 'findById').callsFake(() => {return {some: 'user data', username: 'toto'}; });
+            await service.findEndedGames('666');
+            return (expect(gameModel.find) as any).to.have.been.calledWith({'status.status': GameStatusTypes.ENDED, 'creator': '666'}, null, {sort: {'status.createdAt': -1}})
+                && (expect(_usersService.findById) as any).to.have.been.calledTwice;
+        });
+
+        it('should call gameModel.find() and _usersService.findById() with page and limit if given', async () => {
+            stub(gameModel, 'find').callsFake(() => {return { exec: () => [{some: 'game 1 data'}, {some: 'game 2 data'}] }; });
+            stub(_usersService, 'findById').callsFake(() => {return {some: 'user data', username: 'toto'}; });
+            await service.findEndedGames('666', 0, 5);
+            return (expect(gameModel.find) as any).to.have.been.calledWith({'status.status': GameStatusTypes.ENDED, 'creator': '666'}, null, {sort: {'status.createdAt': -1}, limit: 5, skip: 0})
+                && (expect(_usersService.findById) as any).to.have.been.calledTwice;
         });
     });
 
@@ -175,6 +193,41 @@ describe('GamesService', () => {
             });
         });
 
+        it('should update score if needed when draw', () => {
+            const mockedRound = {
+                creatorMove: {choice: GameMovesTypes.SCISSORS},
+                opponentMove: {choice: GameMovesTypes.SCISSORS},
+                winner: GameWinnersTypes.DRAW
+            };
+            const mockedGame = {
+                mode: GameModesTypes.CLASSIC,
+                rounds: [
+                    mockedRound
+                ],
+                status: {
+                    currentRound: 1,
+                    score: {
+                        creator: 0,
+                        opponent: 0
+                    }
+                }
+            };
+            const res = service.updateGameStatus(mockedGame as any, mockedRound as any);
+            return (expect(res) as any).to.be.deep.eq({
+                mode: GameModesTypes.CLASSIC,
+                rounds: [
+                    mockedRound
+                ],
+                status: {
+                    currentRound: 2,
+                    score: {
+                        creator: 1,
+                        opponent: 1
+                    }
+                }
+            });
+        });
+
         it('should update game status if needed', () => {
             const mockedRound = {
                 creatorMove: {choice: GameMovesTypes.PAPER},
@@ -230,6 +283,34 @@ describe('GamesService', () => {
         it('should return opponent if creator has lost', () => {
             const res = service.calculateGameResult({score: {creator: 2, opponent: 3}} as any);
             return (expect(res) as any).to.equal(GameWinnersTypes.OPPONENT);
+        });
+    });
+
+    describe('computeStats', () => {
+        it('should return correct stats from given games', async () => {
+            stub(service, 'findEndedGames').callsFake(() => { return [
+                {some: 'game 1 data', mode: GameModesTypes.CLASSIC, status: {winner: GameWinnersTypes.CREATOR, createdAt: new Date('2023-01-18 16:00:00'), endedAt: new Date('2023-01-18 16:01:00')}},
+                {some: 'game 2 data', mode: GameModesTypes.CLASSIC, status: {winner: GameWinnersTypes.DRAW, createdAt: new Date('2023-01-18 16:10:00'), endedAt: new Date('2023-01-18 16:10:30')}},
+                {some: 'game 3 data', mode: GameModesTypes.FRENCH, status: {winner: GameWinnersTypes.CREATOR, createdAt: new Date('2023-01-18 16:20:00'), endedAt: new Date('2023-01-18 16:20:45')}},
+                {some: 'game 4 data', mode: GameModesTypes.STAR_TREK, status: {winner: GameWinnersTypes.OPPONENT, createdAt: new Date('2023-01-18 16:30:00'), endedAt: new Date('2023-01-18 16:30:45')}}
+            ]});
+            stub(service, 'findAllPending').callsFake(() => { return [{some: 'game 5 data'}, {some: 'game 6 data'}]});
+            const res = await service.computeStats('666');
+            return (expect(res) as any).to.be.deep.eq({
+                totalPlayedGames: 4,
+                playedByModes: {
+                    classic: 2,
+                    french: 1,
+                    star_trek: 1
+                },
+                totalPendingGames: 2,
+                totalScoreVsComputer: {
+                    win: 2,
+                    lose: 1,
+                    draw: 1
+                },
+                averageTime: 45000
+            });
         });
     });
 });
