@@ -84,7 +84,12 @@ export class GamesController {
                 userId = request.user.userId;
             }
             const result = await this.gamesService.createGameMove(createGameMoveDto, userId);
-            this.logger.info(`${request.user.username} has created a game move: (game id: ${createGameMoveDto.gameId}, round: ${createGameMoveDto.round}, move: ${createGameMoveDto.move})`);
+            let resultString = `${request.user.username} has created a game move `;
+            if (createGameMoveDto.isComputer && createGameMoveDto.isComputer === true) {
+                resultString += 'for computer ';
+            }
+            resultString += `: (game id: ${createGameMoveDto.gameId}, round: ${createGameMoveDto.round}, move: ${createGameMoveDto.move})`;
+            this.logger.info(resultString);
             return result;
         } catch (e) {
             this.logger.error(`${e.message}`);
