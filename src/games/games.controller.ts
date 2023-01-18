@@ -27,6 +27,32 @@ export class GamesController {
     }
 
     /**
+     * Find games in ended status, limiting results by page and limit
+     *
+     * @returns {Promise<Game[]>}
+     * @memberof GamesController
+     */
+    @UseGuards(JwtAuthGuard)
+    @Get('ended/:page/:limit')
+    async findEndedGames(@Req() request: Request | any, @Param('page') page: number, @Param('limit') limit: number): Promise<Game[]> {
+        let userId = null;
+        if (Object.prototype.hasOwnProperty.call(request, 'user') && Object.prototype.hasOwnProperty.call(request.user, 'userId')) {
+            userId = request.user.userId;
+        }
+        return await this.gamesService.findEndedGames(userId, page, limit);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('stats')
+    async getStats(@Req() request: Request | any): Promise<Game> {
+        let userId = null;
+        if (Object.prototype.hasOwnProperty.call(request, 'user') && Object.prototype.hasOwnProperty.call(request.user, 'userId')) {
+            userId = request.user.userId;
+        }
+        return await this.gamesService.getStats(userId);
+    }
+
+    /**
      * Find a game by its id
      *
      * @param {string} id

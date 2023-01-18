@@ -6,7 +6,7 @@ export interface Status {
     status: GameStatusTypes;
     score: Score;
     winner?: GameWinnersTypes;
-    startedAt: Date;
+    createdAt: Date;
     endedAt?: Date;
     currentRound: number;
 }
