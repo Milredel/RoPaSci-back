@@ -2,14 +2,13 @@ import {Inject, Injectable} from '@nestjs/common';
 import {Model} from 'mongoose';
 import {GAME_MODEL_IDENTIFIER} from '../common/constants';
 import {Game} from './interfaces/game.interface';
-
 import {Round} from './interfaces/round.interface';
 import { UsersService } from '../users/users.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { CreateGameMoveDto } from './dto/create-game-move.dto';
 import { RESULT_CHECKER } from './constants';
 import { Status } from './interfaces/status.interface';
-import { GAME_STRINGS } from './constants';
+import { GameStatusTypes, GameWinnersTypes } from './constants';
 
 @Injectable()
 export class GamesService {
@@ -46,7 +45,7 @@ export class GamesService {
      */
     async findAllPending(): Promise<Game[]> {
         const allGames = await this.findAll();
-        return allGames.filter(game => game.status.status === GAME_STRINGS.STATUS.PENDING);
+        return allGames.filter(game => game.status.status === GameStatusTypes.PENDING);
     }
 
     /**
@@ -70,7 +69,7 @@ export class GamesService {
      */
     async createGame(createGameDto: CreateGameDto, userId: string): Promise<Game> {
         const game = new this.gameModel(createGameDto);
-        game.set({creator: userId, currentRound: 1, status: {status: GAME_STRINGS.STATUS.PENDING, createdAt: new Date(), currentRound: 1, score: {creator: 0, opponent: 0}}});
+        game.set({creator: userId, currentRound: 1, status: {status: GameStatusTypes.PENDING, createdAt: new Date(), currentRound: 1, score: {creator: 0, opponent: 0}}});
         await game.save();
         return game;
     }
@@ -136,7 +135,7 @@ export class GamesService {
      * @returns {string}
      * @memberof GamesService
      */
-    calculateRoundResult(game: Game, round: Round): string {
+    calculateRoundResult(game: Game, round: Round): GameWinnersTypes {
         return RESULT_CHECKER[game.mode][round.creatorMove.choice][round.opponentMove.choice];
     }
 
@@ -151,7 +150,7 @@ export class GamesService {
     updateGameStatus(game: Game, round: Round): Game {
         game.status.currentRound = game.status.currentRound + 1;
         const status = JSON.parse(JSON.stringify(game.status));
-        if (round.winner === GAME_STRINGS.WINNERS.DRAW) {
+        if (round.winner === GameWinnersTypes.DRAW) {
             status.score.creator = status.score.creator + 1;
             status.score.opponent = status.score.opponent + 1;
         } else {
@@ -160,7 +159,7 @@ export class GamesService {
         if (game.rounds.length === game.roundNumber) {
             status.winner = this.calculateGameResult(status);
             status.endedAt = new Date();
-            status.status = GAME_STRINGS.STATUS.ENDED;
+            status.status = GameStatusTypes.ENDED;
         }
         game.status = status;
         return game;
@@ -173,11 +172,11 @@ export class GamesService {
      * @returns {string}
      * @memberof GamesService
      */
-    calculateGameResult(status: Status): string {
+    calculateGameResult(status: Status): GameWinnersTypes {
         if (status.score.creator === status.score.opponent) {
-            return GAME_STRINGS.WINNERS.DRAW;
+            return GameWinnersTypes.DRAW;
         } else {
-            return status.score.creator > status.score.opponent ? GAME_STRINGS.WINNERS.CREATOR : GAME_STRINGS.WINNERS.OPPONENT;
+            return status.score.creator > status.score.opponent ? GameWinnersTypes.CREATOR : GameWinnersTypes.OPPONENT;
         }
     }
 

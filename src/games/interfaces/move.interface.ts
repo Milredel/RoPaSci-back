@@ -1,4 +1,6 @@
+import { GameMovesTypes } from "../enums/moves.enum";
+
 export interface Move {
-    choice: string;
+    choice: GameMovesTypes;
     createdAt: Date;
 }

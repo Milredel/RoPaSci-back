@@ -2,7 +2,7 @@ import { GamesController } from './games.controller';
 import { GamesService } from './games.service';
 import { expect, stub, stubClass } from '../../src/test';
 import * as winston from 'winston';
-import { GAME_STRINGS } from './constants';
+import { GameMovesTypes, GameModesTypes, GameOpponentsTypes } from './constants';
 
 describe('GamesController', () => {
     let controller: GamesController;
@@ -41,9 +41,9 @@ describe('GamesController', () => {
             stub(gamesService, 'createGame').callsFake(() => {return {some: 'game data'}; });
             stub(logger, 'info');
             const mockGameData = {
-                mode: GAME_STRINGS.MODES.CLASSIC,
+                mode: GameModesTypes.CLASSIC,
                 roundNumber: 1,
-                opponent: GAME_STRINGS.OPPONENTS.COMPUTER
+                opponent: GameOpponentsTypes.COMPUTER
             };
             const res = await controller.createGame(mockGameData as any, {some: 'request data', user: {username: 'toto', userId: '666'}});
             return (expect(gamesService.createGame) as any).to.have.been.calledWith(mockGameData, '666')
@@ -55,9 +55,9 @@ describe('GamesController', () => {
             stub(gamesService, 'createGame').callsFake(() => Promise.reject('some error'));
             stub(logger, 'error');
             const mockGameData = {
-                mode: GAME_STRINGS.MODES.CLASSIC,
+                mode: GameModesTypes.CLASSIC,
                 roundNumber: 1,
-                opponent: GAME_STRINGS.OPPONENTS.COMPUTER
+                opponent: GameOpponentsTypes.COMPUTER
             };
             try {
                 await controller.createGame(mockGameData as any, {some: 'request data', user: {username: 'toto', userId: '666'}});
@@ -76,7 +76,7 @@ describe('GamesController', () => {
             const mockGameMoveData = {
                 gameId: '9999',
                 round: 1,
-                move: GAME_STRINGS.CHOICES.ROCK
+                move: GameMovesTypes.ROCK
             };
             const res = await controller.createGameMove(mockGameMoveData as any, {some: 'request data', user: {username: 'toto', userId: '666'}});
             return (expect(gamesService.createGameMove) as any).to.have.been.calledWith(mockGameMoveData, '666')
@@ -90,7 +90,7 @@ describe('GamesController', () => {
             const mockGameMoveData = {
                 gameId: '9999',
                 round: 1,
-                move: GAME_STRINGS.CHOICES.ROCK
+                move: GameMovesTypes.ROCK
             };
             try {
                 await controller.createGameMove(mockGameMoveData as any, {some: 'request data', user: {username: 'toto', userId: '666'}});

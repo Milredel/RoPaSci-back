@@ -1,7 +1,7 @@
 import { UsersService } from './../users/users.service';
 import { GamesService } from './games.service';
 import { expect, stub, stubClass } from '../../src/test';
-import { GAME_STRINGS } from './constants';
+import { GameModesTypes, GameMovesTypes, GameStatusTypes, GameWinnersTypes } from './constants';
 
 export class GameModel {
     creator: string;
@@ -43,10 +43,10 @@ describe('GamesService', () => {
 
     describe('findAllPending', () => {
         it('should call gameModel.find() and _usersService.findById()', async () => {
-            stub(service, 'findAll').callsFake(() => {return [{status: {some: 'game 1 status data', status: GAME_STRINGS.STATUS.PENDING}}, {status: {some: 'game 2 status data', status: GAME_STRINGS.STATUS.ENDED}}]; });
+            stub(service, 'findAll').callsFake(() => {return [{status: {some: 'game 1 status data', status: GameStatusTypes.PENDING}}, {status: {some: 'game 2 status data', status: GameStatusTypes.ENDED}}]; });
             const res = await service.findAllPending();
             return (expect(service.findAll) as any).to.have.been.called
-                && (expect(res) as any).to.be.deep.eq([{status: {some: 'game 1 status data', status: GAME_STRINGS.STATUS.PENDING}}]);
+                && (expect(res) as any).to.be.deep.eq([{status: {some: 'game 1 status data', status: GameStatusTypes.PENDING}}]);
         });
     });
 
@@ -87,7 +87,7 @@ describe('GamesService', () => {
         });
 
         it('should throw error if already one move for the given round', async () => {
-            stub(service, 'findById').callsFake(() => {return {creator: '666', rounds: [{creatorMove: {choice: GAME_STRINGS.CHOICES.ROCK}}]}; });
+            stub(service, 'findById').callsFake(() => {return {creator: '666', rounds: [{creatorMove: {choice: GameMovesTypes.ROCK}}]}; });
             try {
                 await service.createGameMove({gameId: '1234', round: 1} as any, '666');
             } catch (e) {
@@ -98,7 +98,7 @@ describe('GamesService', () => {
         it('should call service.updateRoundResult() if everything is good', async () => {
             stub(service, 'findById').callsFake(() => {return new GameModel('666', []); });
             stub(service, 'updateRoundResult');
-            await service.createGameMove({gameId: '1234', round: 1, move: GAME_STRINGS.CHOICES.PAPER} as any, '666');
+            await service.createGameMove({gameId: '1234', round: 1, move: GameMovesTypes.PAPER} as any, '666');
             return (expect(service.updateRoundResult) as any).to.have.been.called;
         });
     });
@@ -125,11 +125,11 @@ describe('GamesService', () => {
     describe('calculateRoundResult', () => {
         it('should return correct result for the round', () => {
             const mockedRound = {
-                creatorMove: {choice: GAME_STRINGS.CHOICES.PAPER},
-                opponentMove: {choice: GAME_STRINGS.CHOICES.SCISSORS}
+                creatorMove: {choice: GameMovesTypes.PAPER},
+                opponentMove: {choice: GameMovesTypes.SCISSORS}
             };
             const mockedGame = {
-                mode: GAME_STRINGS.MODES.CLASSIC,
+                mode: GameModesTypes.CLASSIC,
                 rounds: [
                     mockedRound
                 ]
@@ -142,12 +142,12 @@ describe('GamesService', () => {
     describe('updateGameStatus', () => {
         it('should update score if needed', () => {
             const mockedRound = {
-                creatorMove: {choice: GAME_STRINGS.CHOICES.PAPER},
-                opponentMove: {choice: GAME_STRINGS.CHOICES.SCISSORS},
-                winner: GAME_STRINGS.WINNERS.OPPONENT
+                creatorMove: {choice: GameMovesTypes.PAPER},
+                opponentMove: {choice: GameMovesTypes.SCISSORS},
+                winner: GameWinnersTypes.OPPONENT
             };
             const mockedGame = {
-                mode: GAME_STRINGS.MODES.CLASSIC,
+                mode: GameModesTypes.CLASSIC,
                 rounds: [
                     mockedRound
                 ],
@@ -161,7 +161,7 @@ describe('GamesService', () => {
             };
             const res = service.updateGameStatus(mockedGame as any, mockedRound as any);
             return (expect(res) as any).to.be.deep.eq({
-                mode: GAME_STRINGS.MODES.CLASSIC,
+                mode: GameModesTypes.CLASSIC,
                 rounds: [
                     mockedRound
                 ],
@@ -177,12 +177,12 @@ describe('GamesService', () => {
 
         it('should update game status if needed', () => {
             const mockedRound = {
-                creatorMove: {choice: GAME_STRINGS.CHOICES.PAPER},
-                opponentMove: {choice: GAME_STRINGS.CHOICES.SCISSORS},
-                winner: GAME_STRINGS.WINNERS.OPPONENT
+                creatorMove: {choice: GameMovesTypes.PAPER},
+                opponentMove: {choice: GameMovesTypes.SCISSORS},
+                winner: GameWinnersTypes.OPPONENT
             };
             const mockedGame = {
-                mode: GAME_STRINGS.MODES.CLASSIC,
+                mode: GameModesTypes.CLASSIC,
                 roundNumber: 1,
                 rounds: [
                     mockedRound
@@ -198,7 +198,7 @@ describe('GamesService', () => {
             const res = service.updateGameStatus(mockedGame as any, mockedRound as any);
             delete res.status.endedAt; // because we cannot predict exact hour
             return (expect(res) as any).to.be.deep.eq({
-                mode: GAME_STRINGS.MODES.CLASSIC,
+                mode: GameModesTypes.CLASSIC,
                 roundNumber: 1,
                 rounds: [
                     mockedRound
@@ -209,8 +209,8 @@ describe('GamesService', () => {
                         creator: 0,
                         opponent: 1
                     },
-                    winner: GAME_STRINGS.WINNERS.OPPONENT,
-                    status: GAME_STRINGS.STATUS.ENDED
+                    winner: GameWinnersTypes.OPPONENT,
+                    status: GameStatusTypes.ENDED
                 }
             });
         });
@@ -219,17 +219,17 @@ describe('GamesService', () => {
     describe('calculateGameResult', () => {
         it('should return draw if draw', () => {
             const res = service.calculateGameResult({score: {creator: 1, opponent: 1}} as any);
-            return (expect(res) as any).to.equal(GAME_STRINGS.WINNERS.DRAW);
+            return (expect(res) as any).to.equal(GameWinnersTypes.DRAW);
         });
 
         it('should return creator if creator has won', () => {
             const res = service.calculateGameResult({score: {creator: 2, opponent: 1}} as any);
-            return (expect(res) as any).to.equal(GAME_STRINGS.WINNERS.CREATOR);
+            return (expect(res) as any).to.equal(GameWinnersTypes.CREATOR);
         });
 
         it('should return opponent if creator has lost', () => {
             const res = service.calculateGameResult({score: {creator: 2, opponent: 3}} as any);
-            return (expect(res) as any).to.equal(GAME_STRINGS.WINNERS.OPPONENT);
+            return (expect(res) as any).to.equal(GameWinnersTypes.OPPONENT);
         });
     });
 });

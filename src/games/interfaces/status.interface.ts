@@ -1,9 +1,11 @@
 import { Score } from './score.interface';
+import { GameWinnersTypes } from '../enums/winners.enum';
+import { GameStatusTypes } from '../enums/status.enum';
 
 export interface Status {
-    status: string; // pending | ended
+    status: GameStatusTypes;
     score: Score;
-    winner?: string; // creator | opponent | draw
+    winner?: GameWinnersTypes;
     startedAt: Date;
     endedAt?: Date;
     currentRound: number;

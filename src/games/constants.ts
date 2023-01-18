@@ -1,111 +1,90 @@
-export const GAME_STRINGS = {
-    CHOICES: {
-        ROCK: 'rock',
-        PAPER: 'paper',
-        SCISSORS: 'scissors',
-        WELL: 'well',
-        LIZARD: 'lizard',
-        SPOCK: 'spock'
-    },
-    MODES: {
-        CLASSIC: 'classic',
-        FRENCH: 'french',
-        STAR_TREK: 'star_trek'
-    },
-    OPPONENTS: {
-        COMPUTER: 'computer',
-        HUMAN: 'human'
-    },
-    STATUS: {
-        PENDING: 'pending',
-        ENDED: 'ended'
-    },
-    WINNERS: {
-        CREATOR: 'creator',
-        OPPONENT: 'opponent',
-        DRAW: 'draw'
-    }
-};
+import { GameWinnersTypes } from "./enums/winners.enum";
 
 export const RESULT_CHECKER = {
     'classic': {
         'rock' : {
-            'rock' : 'draw',
-            'scissors' : 'creator',
-            'paper' : 'opponent'
+            'rock' : GameWinnersTypes.DRAW,
+            'scissors' : GameWinnersTypes.CREATOR,
+            'paper' : GameWinnersTypes.OPPONENT
         },
         'scissors' : {
-            'rock' : 'opponent',
-            'scissors' : 'draw',
-            'paper' : 'creator'
+            'rock' : GameWinnersTypes.OPPONENT,
+            'scissors' : GameWinnersTypes.DRAW,
+            'paper' : GameWinnersTypes.CREATOR
         },
         'paper' : {
-            'rock' : 'creator',
-            'scissors' : 'opponent',
-            'paper' : 'draw'
+            'rock' : GameWinnersTypes.CREATOR,
+            'scissors' : GameWinnersTypes.OPPONENT,
+            'paper' : GameWinnersTypes.DRAW
         }
     },
     'french': {
         'rock' : {
-            'rock' : 'draw',
-            'scissors' : 'creator',
-            'paper' : 'opponent',
-            'well': 'opponent'
+            'rock' : GameWinnersTypes.DRAW,
+            'scissors' : GameWinnersTypes.CREATOR,
+            'paper' : GameWinnersTypes.OPPONENT,
+            'well': GameWinnersTypes.OPPONENT
         },
         'scissors' : {
-            'rock' : 'opponent',
-            'scissors' : 'draw',
-            'paper' : 'creator',
-            'well': 'opponent'
+            'rock' : GameWinnersTypes.OPPONENT,
+            'scissors' : GameWinnersTypes.DRAW,
+            'paper' : GameWinnersTypes.CREATOR,
+            'well': GameWinnersTypes.OPPONENT
         },
         'paper' : {
-            'rock' : 'creator',
-            'scissors' : 'opponent',
-            'paper' : 'draw',
-            'well': 'creator'
+            'rock' : GameWinnersTypes.CREATOR,
+            'scissors' : GameWinnersTypes.OPPONENT,
+            'paper' : GameWinnersTypes.DRAW,
+            'well': GameWinnersTypes.CREATOR
         },
         'well': {
-            'rock' : 'creator',
-            'scissors' : 'creator',
-            'paper' : 'opponent',
-            'well': 'draw'
+            'rock' : GameWinnersTypes.CREATOR,
+            'scissors' : GameWinnersTypes.CREATOR,
+            'paper' : GameWinnersTypes.OPPONENT,
+            'well': GameWinnersTypes.DRAW
         }
     },
     'star_trek': {
         'rock' : {
-            'rock' : 'draw',
-            'scissors' : 'creator',
-            'paper' : 'opponent',
-            'lizard': 'creator',
-            'spock': 'opponent'
+            'rock' : GameWinnersTypes.DRAW,
+            'scissors' : GameWinnersTypes.CREATOR,
+            'paper' : GameWinnersTypes.OPPONENT,
+            'lizard': GameWinnersTypes.CREATOR,
+            'spock': GameWinnersTypes.OPPONENT
         },
         'scissors' : {
-            'rock' : 'opponent',
-            'scissors' : 'draw',
-            'paper' : 'creator',
-            'lizard': 'creator',
-            'spock': 'opponent'
+            'rock' : GameWinnersTypes.OPPONENT,
+            'scissors' : GameWinnersTypes.DRAW,
+            'paper' : GameWinnersTypes.CREATOR,
+            'lizard': GameWinnersTypes.CREATOR,
+            'spock': GameWinnersTypes.OPPONENT
         },
         'paper' : {
-            'rock' : 'creator',
-            'scissors' : 'opponent',
-            'paper' : 'draw',
-            'lizard': 'opponent',
-            'spock': 'creator'
+            'rock' : GameWinnersTypes.CREATOR,
+            'scissors' : GameWinnersTypes.OPPONENT,
+            'paper' : GameWinnersTypes.DRAW,
+            'lizard': GameWinnersTypes.OPPONENT,
+            'spock': GameWinnersTypes.CREATOR
         },
         'lizard': {
-            'rock' : 'opponent',
-            'scissors' : 'opponent',
-            'paper' : 'creator',
-            'lizard': 'draw',
-            'spock': 'creator'
+            'rock' : GameWinnersTypes.OPPONENT,
+            'scissors' : GameWinnersTypes.OPPONENT,
+            'paper' : GameWinnersTypes.CREATOR,
+            'lizard': GameWinnersTypes.DRAW,
+            'spock': GameWinnersTypes.CREATOR
         },
         'spock': {
-            'rock' : 'creator',
-            'scissors' : 'creator',
-            'paper' : 'opponent',
-            'lizard': 'opponent',
-            'spock': 'draw'
+            'rock' : GameWinnersTypes.CREATOR,
+            'scissors' : GameWinnersTypes.CREATOR,
+            'paper' : GameWinnersTypes.OPPONENT,
+            'lizard': GameWinnersTypes.OPPONENT,
+            'spock': GameWinnersTypes.DRAW
         }
     }
 };
+
+export { GameModesTypes } from './enums/modes.enum';
+export { GameMovesTypes } from './enums/moves.enum';
+export { GameOpponentsTypes } from './enums/opponents.enum';
+export { GameStatusTypes } from './enums/status.enum';
+export { GameWinnersTypes } from './enums/winners.enum';
